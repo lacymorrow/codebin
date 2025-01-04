@@ -1,11 +1,9 @@
-import GithubAuth from "@/components/auth/github";
-import GoogleAuth from "@/components/auth/google";
+import Hero from "@/components/page/hero";
 
 export default function Home() {
   return (
     <div>
-      <GoogleAuth />
-      <GithubAuth/>
+      <Hero/>
     </div>
   );
 }
