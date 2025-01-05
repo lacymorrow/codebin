@@ -1,15 +1,15 @@
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
-import { Open_Sans } from "next/font/google";
+import { Bricolage_Grotesque } from "next/font/google";
 
 export const metadata = {
   title: "Codebin",
   description: "Share code with output and syntax highlighting with ease.",
 };
 
-const open_sans = Open_Sans({
+const open_sans = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"]
+  weight: ["200","300","400", "500", "600", "700", "800"],
 });
 
 export default function RootLayout({ children }) {
