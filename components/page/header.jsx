@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ThemeSwitcher } from "../theme-switcher";
+import { ThemeSwitcher } from "../ui/theme-switcher";
 import { Button } from "../ui/button";
 import { RainbowButton } from "../ui/rainbow-button";
 import Logo from "../ui/logo";
