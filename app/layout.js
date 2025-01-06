@@ -1,6 +1,7 @@
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
 import { Bricolage_Grotesque } from "next/font/google";
+import { Toaster } from "sonner";
 
 export const metadata = {
   title: "Codebin",
@@ -9,7 +10,7 @@ export const metadata = {
 
 const open_sans = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["200","300","400", "500", "600", "700", "800"],
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
 });
 
 export default function RootLayout({ children }) {
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
         >
           {children}
         </ThemeProvider>
+        <Toaster position="top-center" />
       </body>
     </html>
   );
