@@ -9,6 +9,6 @@ export default function Logout() {
     const router = useRouter();
 
     return (
-        <Button onClick={() => { signOut(auth); deleteCookie('token'); router.push('/'); }}>logout</Button>
+        <Button onClick={() => { signOut(auth); deleteCookie('token'); window.location.href = '/'; }}>logout</Button>
     );
 }

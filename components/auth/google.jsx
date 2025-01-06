@@ -23,7 +23,7 @@ const GoogleAuth = ({ variant, size, className, children }) => {
                 maxAge: 60 * 60 * 24,
             });
             setLoading(false);
-            return router.push('/dashboard');
+            return window.location.href = '/dashboard';
         } catch (error) {
             setLoading(false);
             toast.error('Error signing in with Google');
