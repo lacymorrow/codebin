@@ -9,7 +9,7 @@ export default function Hero() {
     return (
         <div className="px-6 py-10">
             <div className="grid mx-auto max-w-2xl gap-4 text-center place-items-center">
-                <div className="flex -mb-1 items-center gap-2 bg-secondary/10 border-border border rounded-md w-fit px-3 py-0.5">
+                <div className="flex -mb-1 items-center gap-2 bg-background/50 backdrop-blur-lg border-border border rounded-md w-fit px-3 py-0.5">
                     <StarsIcon className="h-3 w-3" />
                     <a href="https://github.com/r2hu1/codebin" target="_blank" className="text-sm text-foreground/80 hover:underline">
                         Give us a Star on Github

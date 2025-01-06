@@ -5,7 +5,11 @@ import TechStack from "@/components/page/techstack";
 
 export default function Home() {
   return (
-    <div>
+    <div className="relative">
+      <img
+        src="/bg_gradient.avif"
+        className="absolute w-full -z-50 -top-0"
+      />
       <Header />
       <Hero />
       <Footer />

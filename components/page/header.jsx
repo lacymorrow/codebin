@@ -6,11 +6,7 @@ import Logo from "../ui/logo";
 
 export default function Header() {
     return (
-        <header className="relative md:px-20 lg:px-32 flex mb-10 justify-between py-3 px-6 items-center">
-            <img
-                src="/bg_gradient.avif"
-                className="absolute -z-50 -top-0"
-            />
+        <header className="md:px-20 lg:px-32 flex mb-10 justify-between py-3 px-6 items-center">
             <Logo />
             <div className="flex items-center gap-2">
                 <Link href="/dashboard">
