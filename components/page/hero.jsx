@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { ChevronRight, Stars, StarsIcon } from "lucide-react";
 import { RainbowButton } from "../ui/rainbow-button";
-import { BorderBeam } from "../ui/border-beam";
 import TechStack from "./techstack";
+import { BorderTrail } from "../ui/border-trail";
 
 export default function Hero() {
     return (
@@ -34,13 +34,13 @@ export default function Hero() {
                 </div>
             </div>
             <TechStack />
-            <div className="relative rounded-md p-0.5 mt-10 max-w-[800px] mx-auto">
+            <div className="relative rounded-md p-[1px] mt-10 max-w-[800px] mx-auto">
                 <img
                     src="https://via.placeholder.com/800x450?text=in++development"
                     alt="Codebin illustration"
                     className="h-72 sm:h-full max-h-[450px] w-full object-cover rounded-md"
                 />
-                <BorderBeam borderWidth={2} />
+                <BorderTrail/>
             </div>
         </div>
     );
