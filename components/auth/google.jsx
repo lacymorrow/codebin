@@ -5,8 +5,10 @@ import { setCookie } from 'cookies-next';
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
-const GoogleAuth = ({variant,size,className,children}) => {
+const GoogleAuth = ({ variant, size, className, children }) => {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const initAuth = async () => {
@@ -20,16 +22,17 @@ const GoogleAuth = ({variant,size,className,children}) => {
                 sameSite: 'lax',
                 maxAge: 60 * 60 * 24,
             });
-            router.push('/dashboard');
             setLoading(false);
-            return window.location.reload();
+            return router.push('/dashboard');
         } catch (error) {
+            setLoading(false);
+            toast.error('Error signing in with Google');
             console.error("Error signing in with Google:", error);
         }
     }
     return (
         <Button disabled={loading} size={size} onClick={initAuth} variant={variant} className={className}>
-            {children}
+            {!loading ? children : <Loader2 className="h-4 w-4 animate-spin" />}
         </Button>
     )
 };

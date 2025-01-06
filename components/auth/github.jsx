@@ -5,8 +5,10 @@ import { signInWithPopup } from "firebase/auth";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
-const GithubAuth = ({variant,size,className,children}) => {
+const GithubAuth = ({ variant, size, className, children }) => {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const initAuth = async () => {
@@ -21,16 +23,17 @@ const GithubAuth = ({variant,size,className,children}) => {
                 maxAge: 60 * 60 * 24,
             });
             setLoading(false);
-            router.push('/dashboard');
-            return window.location.reload();
+            return router.push('/dashboard');
         } catch (error) {
+            setLoading(false);
+            toast.error('Error signing in with GitHub');
             console.error("Error signing in with GitHub:", error);
         }
     };
 
     return (
         <Button disabled={loading} size={size} onClick={initAuth} variant={variant} className={className}>
-            {children}
+            {!loading ? children : <Loader2 className="h-4 w-4 animate-spin" />}
         </Button>
     );
 };
