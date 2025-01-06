@@ -6,6 +6,9 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "./button";
 import { RainbowButton } from "./rainbow-button";
+import { usePathname, useRouter } from "next/navigation";
+import { TbCodePlus } from "react-icons/tb";
+import { Plus } from "lucide-react";
 
 const buttonVariants = {
   initial: {
@@ -36,6 +39,7 @@ export function ExpandableTabs({
 }) {
   const [selected, setSelected] = React.useState(null);
   const outsideClickRef = React.useRef(null);
+  const path = usePathname();
 
   useOnClickOutside(outsideClickRef, () => {
     setSelected(null);
@@ -66,8 +70,8 @@ export function ExpandableTabs({
           return (
             <Link key={tab.title} href={tab.href || "#"}>
               <Button asChild>
-                <RainbowButton>
-                  {tab.title}{tab.icon}
+                <RainbowButton className="gap-1.5">
+                  {tab.title}<Plus size={20}/>
                 </RainbowButton>
               </Button>
             </Link>
@@ -91,7 +95,7 @@ export function ExpandableTabs({
                   selected === index
                     ? cn("bg-muted", activeColor)
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}>
+                ,path.includes(tab.href) ? "bg-muted text-foreground" : "")}>
                 <Icon size={20} />
                 <AnimatePresence initial={false}>
                   {selected === index && (
