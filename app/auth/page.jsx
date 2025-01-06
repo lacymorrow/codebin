@@ -2,6 +2,7 @@
 
 import GithubAuth from "@/components/auth/github";
 import GoogleAuth from "@/components/auth/google";
+import Logo from "@/components/ui/logo";
 import { getCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -12,11 +13,14 @@ export default function Page() {
     const token = getCookie('token');
     const router = useRouter();
     useEffect(() => {
-        if(token) return router.push('/dashboard');
-    },[]);
+        if (token) return router.push('/dashboard');
+    }, []);
     return (
         <div className="px-6 h-full w-full absolute top-0 left-0 right-0 bottom-0 grid place-items-center">
             <div className="absolute top-0 z-[-2] h-full w-full dark:bg-neutral-950 bg-background bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
+            {/* <div className="absolute text-center top-10 grid place-items-center">
+                <Logo />
+            </div> */}
             <div className="grid gap-5">
                 <div className="text-center max-w-xs">
                     <h1 className="text-xl font-bold">Login or Signup</h1>
