@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { ChevronRight, Stars, StarsIcon } from "lucide-react";
-import { RainbowButton } from "../ui/rainbow-button";
 import TechStack from "./techstack";
 import { BorderTrail } from "../ui/border-trail";
+import GetStartedBtn from "./get-started-btn";
 
 export default function Hero() {
     return (
@@ -23,11 +23,7 @@ export default function Hero() {
                     Codebin makes sharing code snippets with output simple. Whether you're a developer or not, you can view and share syntax-highlighted snippets effortlessly.
                 </p>
                 <div className="flex gap-3 mt-4">
-                    <Link href="/dashboard">
-                        <Button asChild>
-                            <RainbowButton>Get Started</RainbowButton>
-                        </Button>
-                    </Link>
+                    <GetStartedBtn/>
                     <Link href="https://github.com/r2hu1/codebin">
                         <Button variant="outline">Github <Stars className="h-4 w-4" /></Button>
                     </Link>
