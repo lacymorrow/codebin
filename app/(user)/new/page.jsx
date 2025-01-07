@@ -97,10 +97,17 @@ export default function Page() {
                                     padding: {
                                         top: 10,
                                         bottom: 10,
-                                        right: 10,
+                                        right: 8,
                                     },
                                     quickSuggestions: false,
                                     links: false,
+                                    contextmenu: false,
+                                    lineNumbersMinChars: 2,
+                                    lineNumbers: "on",
+                                    scrollbar: {
+                                        vertical: "hidden",
+                                        horizontal: "hidden",
+                                    },
                                 }}
                             />
                         </div>
