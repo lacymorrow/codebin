@@ -70,8 +70,8 @@ export function ExpandableTabs({
           return (
             <Link key={tab.title} href={tab.href || "#"}>
               <Button asChild>
-                <RainbowButton className="gap-1.5">
-                  {tab.title}<Plus size={20}/>
+                <RainbowButton onClick={() => handleSelect(index)} className="gap-1.5">
+                  {tab.title}<Plus size={20} />
                 </RainbowButton>
               </Button>
             </Link>
@@ -95,7 +95,7 @@ export function ExpandableTabs({
                   selected === index
                     ? cn("bg-muted", activeColor)
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                ,path.includes(tab.href) ? "bg-muted text-foreground" : "")}>
+                  , path.includes(tab.href) ? "bg-muted text-foreground" : "")}>
                 <Icon size={20} />
                 <AnimatePresence initial={false}>
                   {selected === index && (
