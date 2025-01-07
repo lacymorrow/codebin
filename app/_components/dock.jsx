@@ -1,12 +1,12 @@
 "use client"
 import { ExpandableTabs } from "@/components/ui/expandable-tabs";
-import { CodeXml, Home, Plus, UserRoundPen } from "lucide-react";
+import { CodeXml, Home, Plus, UserRound } from "lucide-react";
 
 export default function Dock() {
     const tabs = [
         { title: "Dashboard", href: "/dashboard", icon: Home },
         { title: "Snippets", href: "/snippets", icon: CodeXml },
-        { title: "Profile", href: "/me", icon: UserRoundPen },
+        { title: "Profile", href: "/me", icon: UserRound },
         { type: "separator" },
         { type: "button", title: "Create", href: "/new" },
     ];
