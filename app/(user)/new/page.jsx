@@ -133,7 +133,7 @@ export default function Page() {
             <div className="grid gap-4">
                 <div className="flex items-center gap-3 justify-between">
                     <div className="flex items-center gap-2">
-                        <Button size="icon" variant="outline"><Copy className="h-4 w-4" /></Button>
+                        <Button size="icon" variant="outline" onClick={() => { navigator.clipboard.writeText(code); toast.success("Copied to clipboard!"); }}><Copy className="h-4 w-4" /></Button>
                         <Button variant="outline" className="gap-1">Share <Share2 className="h-4 w-4" /></Button>
                     </div>
                     <Button size="icon" asChild onClick={executeCode} disabled={running}>
