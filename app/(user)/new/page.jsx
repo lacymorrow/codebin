@@ -121,11 +121,9 @@ export default function Page() {
             });
         } finally {
             setRunning(false);
-            if (outputElement) {
+            if (outputElement.current) {
                 outputElement.current.scrollIntoView({ behavior: "smooth" });
             }
-            console.log(output)
-            console.log(error)
             return;
         }
     };
@@ -171,7 +169,6 @@ export default function Page() {
                                 width="100%"
                                 loading={<Loader2 className="h-5 w-5 animate-spin" />}
                                 value={code}
-                                defaultValue="// Write your code here"
                                 onChange={(data) => setCode(data)}
                                 language={selectedLanguage.straightName.toLowerCase()}
                                 theme={theme === "dark" ? "vs-dark" : ""}
@@ -202,21 +199,36 @@ export default function Page() {
                             />
                         </div>
                     </div>
-                    <div className="mt-5 sm:mt-0 shadow-sm">
+                    <div className="mt-5 sm:mt-0 shadow-sm max-w-full">
                         <div className="bg-muted/20 border border-border flex items-center justify-between px-3 py-1 rounded-b-none rounded-sm">
                             <h1 className="text-sm text-foreground/80">Code Output</h1>
                             <Copy className="!h-3 !w-3" />
                         </div>
-                        <ScrollArea ref={outputElement} className="scrollbar-hidden overflow-x-scroll rounded-sm text-wrap p-3 border border-border border-t-0 h-60 sm:h-[366px] w-full bg-secondary/40 rounded-t-none">
-                            {!error ? output?.error ? (
-                                <span className="text-red-500">{output.error}</span>
+                        <ScrollArea
+                            className="overflow-x-scroll scrollbar-hidden rounded-sm p-3 border border-border border-t-0 h-60 sm:h-[366px] bg-secondary/40 rounded-t-none w-full max-w-full"
+                        >
+                            {!error ? (
+                                output?.error ? (
+                                    <span className="text-red-500 font-mono text-sm">{output.error}</span>
+                                ) : (
+                                    <div
+                                        className="text-sm font-mono whitespace-pre-wrap break-words max-w-full"
+                                        style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+                                    >
+                                        {output?.output}
+                                    </div>
+                                )
                             ) : (
-                                <pre className="whitespace-pre-wrap text-wrap">{output?.output}</pre>
-                            ) : (
-                                <span className="text-red-500 text-sm">{error.error}</span>
+                                <span className="text-red-500 font-mono text-sm">{error.error}</span>
                             )}
+                            {!error && !output ? !running ? (
+                                <span className="text-sm text-foreground/80">No Output.</span>
+                            ) : (
+                                <span className="text-sm text-foreground/80">Running...</span>
+                            ) : ""}
                             <ScrollBar orientation="horizontal" />
                         </ScrollArea>
+                        <div ref={outputElement} className="sm:hidden"></div>
                     </div>
                 </div>
             </div>
