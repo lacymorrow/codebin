@@ -23,6 +23,14 @@ import { TbBrandCpp } from "react-icons/tb";
 import { LANGUAGE_CONFIG } from "@/app/_constants/config";
 import { toast } from "sonner";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 
 
 export default function Page() {
@@ -134,7 +142,28 @@ export default function Page() {
                 <div className="flex items-center gap-3 justify-between">
                     <div className="flex items-center gap-2">
                         <Button size="icon" variant="outline" onClick={() => { navigator.clipboard.writeText(code); toast.success("Copied to clipboard!"); }}><Copy className="h-4 w-4" /></Button>
-                        <Button variant="outline" className="gap-1">Share <Share2 className="h-4 w-4" /></Button>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button>Publish</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle className="text-start">Publishing your snippet!</DialogTitle>
+                                    <DialogDescription className="text-start">
+                                        <p>Please fill out the form below to publish your snippet</p>
+                                        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3 mt-5">
+                                            <Label className="-mb-2" htmlFor="title">Title</Label>
+                                            <Input id="title" placeholder="e.g: Hello World in JavaScript" {...register("title", { required: true })} />
+                                            <Label className="-mb-2" htmlFor="description">Description</Label>
+                                            <Textarea id="description" placeholder="e.g: A simple hello world in JavaScript" {...register("description")} />
+                                            <Button type="submit" className="w-full">
+                                                Publish
+                                            </Button>
+                                        </form>
+                                    </DialogDescription>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                     <Button size="icon" asChild onClick={executeCode} disabled={running}>
                         <RainbowButton className="!w-10 px-0 py-0 !h-10">
@@ -235,12 +264,3 @@ export default function Page() {
         </div >
     );
 }
-{/* <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3 mt-5">
-    <Label className="-mb-2" htmlFor="title">Title</Label>
-    <Input id="title" placeholder="e.g: Hello World in JavaScript" {...register("title", { required: true })} />
-    <Label className="-mb-2" htmlFor="description">Description</Label>
-    <Textarea id="description" placeholder="e.g: A simple hello world in JavaScript" {...register("description")} />
-    <Button type="submit" asChild className="w-full">
-        <RainbowButton>Create</RainbowButton>
-    </Button>
-</form> */}
