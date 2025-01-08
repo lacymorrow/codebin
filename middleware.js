@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export function middleware(req) {
     const token = getCookie('token', { req });
 
-    const protectedRoutes = ['/dashboard', '/me','/new'];
+    const protectedRoutes = ['/me','/new'];
 
     if (protectedRoutes.some(route => req.nextUrl.pathname.startsWith(route))) {
         if (!token) {
@@ -17,5 +17,5 @@ export function middleware(req) {
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/profile/:path*'],
+    matcher: ['/new/:path*', '/me/:path*'],
 };
