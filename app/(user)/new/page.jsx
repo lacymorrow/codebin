@@ -18,39 +18,129 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { TbBrandCpp } from "react-icons/tb";
+import { LANGUAGE_CONFIG } from "@/app/_constants/config";
+import { toast } from "sonner";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 
 export default function Page() {
     const { theme } = useTheme();
-
-    const { register, handleSubmit, watch, formState: { errors } } = useForm();
-
     const languages = [
         { name: "JavaScript", straightName: "JavaScript", icon: <IoLogoJavascript className="h-3 w-3" /> },
         { name: "Python", straightName: "Python", icon: <IoLogoPython className="h-3 w-3" /> },
         { name: "Java", straightName: "Java", icon: <FaJava className="h-3 w-3" /> },
         { name: "C++", straightName: "Cpp", icon: <TbBrandCpp className="h-3 w-3" /> },
     ];
-
     const [selectedLanguage, setSelectedLanguage] = useState(languages[0]);
+    const [code, setCode] = useState(null);
+    const [output, setOutput] = useState(null);
+    const [error, setError] = useState(null);
+    const [running, setRunning] = useState(false);
+    const { register, handleSubmit, watch, formState: { errors } } = useForm();
+    const outputElement = useRef(null);
 
     const onSubmit = (data) => {
         console.log(data)
     };
+
+    const executeCode = async () => {
+        if (!code) {
+            toast.error("Please enter some code");
+            return;
+        }
+        setError(null);
+        setOutput(null);
+        try {
+            setRunning(true);
+            const runtime = LANGUAGE_CONFIG[selectedLanguage.straightName.toLowerCase()].pistonRuntime;
+            const response = await fetch("https://emkc.org/api/v2/piston/execute", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    language: runtime.language,
+                    version: runtime.version,
+                    files: [{ content: code }],
+                }),
+            });
+
+            const data = await response.json();
+
+            console.log("data back from piston:", data);
+
+            // handle API-level erros
+            if (data.message) {
+                return setOutput({ error: data.message, executionResult: { code, output: "", error: data.message } });
+            }
+
+            // handle compilation errors
+            if (data.compile && data.compile.code !== 0) {
+                const error = data.compile.stderr || data.compile.output;
+                return setError({
+                    error,
+                    executionResult: {
+                        code,
+                        output: "",
+                        error,
+                    },
+                });
+            }
+
+            if (data.run && data.run.code !== 0) {
+                const error = data.run.stderr || data.run.output;
+                return setError({
+                    error,
+                    executionResult: {
+                        code,
+                        output: "",
+                        error,
+                    },
+                });
+            }
+
+            // if we get here, execution was successful
+            const output = data.run.output;
+
+            return setOutput({
+                output: output.trim(),
+                error: null,
+                executionResult: {
+                    code,
+                    output: output.trim(),
+                    error: null,
+                },
+            });
+        } catch (error) {
+            console.log("Error running code:", error);
+            return setError({
+                error: "Error running code",
+                executionResult: { code, output: "", error: "Error running code" },
+            });
+        } finally {
+            setRunning(false);
+            if (outputElement) {
+                outputElement.current.scrollIntoView({ behavior: "smooth" });
+            }
+            console.log(output)
+            console.log(error)
+            return;
+        }
+    };
+
     return (
         <div className="px-6 md:px-20 lg:px-32 mb-10">
             <div className="grid gap-4">
                 <div className="flex items-center gap-3 justify-between">
                     <div className="flex items-center gap-2">
-                        <Button size="icon"><ArrowDownToLine className="h-4 w-4" /></Button>
-                        <Button size="icon"><Copy className="h-4 w-4" /></Button>
+                        <Button size="icon" variant="outline"><Copy className="h-4 w-4" /></Button>
                         <Button variant="outline" className="gap-1">Share <Share2 className="h-4 w-4" /></Button>
                     </div>
-                    <Button size="icon" asChild>
+                    <Button size="icon" asChild onClick={executeCode} disabled={running}>
                         <RainbowButton className="!w-10 px-0 py-0 !h-10">
-                            <Play className="h-4 w-4" />
+                            {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                         </RainbowButton>
                     </Button>
                 </div>
@@ -77,12 +167,12 @@ export default function Page() {
                         </div>
                         <div className="rounded-sm rounded-t-none border border-border border-t-0 overflow-hidden">
                             <Editor
-                                height="400px"
+                                height="420px"
                                 width="100%"
-                                loading={<Loader2 className="h-4 w-4 animate-spin" />}
+                                loading={<Loader2 className="h-5 w-5 animate-spin" />}
+                                value={code}
                                 defaultValue="// Write your code here"
-                                onChange={(data) => console.log(data)}
-                                defaultLanguage={languages[0].straightName.toLowerCase()}
+                                onChange={(data) => setCode(data)}
                                 language={selectedLanguage.straightName.toLowerCase()}
                                 theme={theme === "dark" ? "vs-dark" : ""}
                                 options={{
@@ -90,7 +180,7 @@ export default function Page() {
                                         enabled: false,
                                     },
                                     wrappingIndent: "none",
-                                    wordWrap: "on",
+                                    wordWrap: "off",
                                     fontSize: 14,
                                     scrollBeyondLastLine: false,
                                     automaticLayout: true,
@@ -101,29 +191,36 @@ export default function Page() {
                                     },
                                     quickSuggestions: false,
                                     links: false,
-                                    contextmenu: false,
                                     lineNumbersMinChars: 2,
                                     lineNumbers: "on",
                                     scrollbar: {
-                                        vertical: "hidden",
-                                        horizontal: "hidden",
+                                        vertical: "visible",
+                                        horizontal: "visible",
                                     },
+                                    suggestLineHeight: 0,
                                 }}
                             />
                         </div>
                     </div>
                     <div className="mt-5 sm:mt-0 shadow-sm">
                         <div className="bg-muted/20 border border-border flex items-center justify-between px-3 py-1 rounded-b-none rounded-sm">
-                            <h1 className="text-sm">Code Output</h1>
+                            <h1 className="text-sm text-foreground/80">Code Output</h1>
                             <Copy className="!h-3 !w-3" />
                         </div>
-                        <div className="rounded-sm border border-border border-t-0 h-72 sm:h-[366px] w-full bg-secondary/40 rounded-t-none">
-
-                        </div>
+                        <ScrollArea ref={outputElement} className="scrollbar-hidden overflow-x-scroll rounded-sm text-wrap p-3 border border-border border-t-0 h-60 sm:h-[366px] w-full bg-secondary/40 rounded-t-none">
+                            {!error ? output?.error ? (
+                                <span className="text-red-500">{output.error}</span>
+                            ) : (
+                                <pre className="whitespace-pre-wrap text-wrap">{output?.output}</pre>
+                            ) : (
+                                <span className="text-red-500 text-sm">{error.error}</span>
+                            )}
+                            <ScrollBar orientation="horizontal" />
+                        </ScrollArea>
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 {/* <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3 mt-5">
