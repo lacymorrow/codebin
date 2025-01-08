@@ -71,14 +71,13 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border m-0 p-0;
   }
   body {
-    @apply bg-background text-foreground !overflow-x-hidden;
+    @apply bg-background text-foreground;
   }
   .scrollbar-hidden{
     -ms-overflow-style: none;
     scrollbar-width: none;
-    
   }
 }
