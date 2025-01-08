@@ -7,7 +7,7 @@ import { RainbowButton } from "../ui/rainbow-button";
 export default function GetStartedBtn() {
     const token = getCookie('token');
     return (
-        <Link href={!token ? "/auth" : "/dashboard"}>
+        <Link href={!token ? "/auth" : "/me"}>
             <Button asChild>
                 <RainbowButton>{!token ? "Get Started" : "Dashboard"}</RainbowButton>
             </Button>

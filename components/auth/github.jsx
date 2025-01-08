@@ -23,7 +23,7 @@ const GithubAuth = ({ variant, size, className, children }) => {
                 maxAge: 60 * 60 * 24,
             });
             setLoading(false);
-            return window.location.href = '/dashboard';
+            return window.location.href = '/me';
         } catch (error) {
             setLoading(false);
             toast.error('Error signing in with GitHub');
