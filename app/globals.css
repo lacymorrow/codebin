@@ -76,4 +76,9 @@
   body {
     @apply bg-background text-foreground !overflow-x-hidden;
   }
+  .scrollbar-hidden{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    
+  }
 }
