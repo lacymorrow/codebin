@@ -278,7 +278,7 @@ export default function Page() {
                     <div className="mt-5 sm:mt-0 shadow-sm max-w-full">
                         <div className="bg-muted/20 border border-border flex items-center justify-between px-3 py-1 rounded-b-none rounded-sm">
                             <h1 className="text-sm text-foreground/80">Code Output</h1>
-                            <Copy className="!h-3 !w-3" />
+                            <Copy className="!h-3 !w-3" onClick={() => {navigator.clipboard.writeText(output?.output || error.error); toast.success("Copied to clipboard!");}}/>
                         </div>
                         <ScrollArea
                             className="overflow-x-scroll scrollbar-hidden rounded-sm p-3 border border-border border-t-0 h-60 sm:h-[366px] bg-secondary/40 rounded-t-none w-full max-w-full"
