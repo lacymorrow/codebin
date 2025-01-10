@@ -7,6 +7,7 @@ import createSnippet from '@/server_functions/createSnippet';
 import getUserSnippets from '@/server_functions/getUserSnippets';
 import { getCurrentUser } from '@/utils/current-user';
 import { Copy, Edit, Share, Share2 } from 'lucide-react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import {
     Dialog,
     DialogContent,
@@ -19,10 +20,15 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { oneLight, vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { useTheme } from 'next-themes';
+import { lightfair } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const UserProfile = () => {
     const [user, setUser] = useState(null);
     const [snippets, setSnippets] = useState([]);
+    const { theme } = useTheme();
 
     const fetchSnippets = async () => {
         if (!user) return;
@@ -91,12 +97,14 @@ const UserProfile = () => {
                     {snippets && snippets.map((snippet) => (
                         <div
                             key={snippet.id}
-                            className="border flex flex-col border-border h-fit bg-card rounded-md p-4 shadow-sm break-inside-avoid"
+                            className="border flex flex-col border-border h-fit bg-card rounded-md p-4 shadow-sm overflow-hidden"
                         >
-                            <div className="bg-secondary rounded-md p-2 mb-3 overflow-hidden break-words max-h-[150px] min-h-[150px]">
-                                <p className="text-sm text-foreground/80 overflow-hidden break-words">
-                                    {snippet.code}
-                                </p>
+                            <div className="rounded-md mb-5">
+                                <ScrollArea className='scrollbar-hidden h-40 rounded-md overflow-hidden'>
+                                    <SyntaxHighlighter language={snippet.language} style={theme === 'dark' ? vscDarkPlus : oneLight} wrapLines customStyle={{ margin: 0, padding: '10px', borderRadius: '8px', overflow: 'hidden', width: '100%', overflowX: 'hidden', overflowY: 'hidden', fontSize: '13px', minHeight: '150px' }}>
+                                        {snippet.code}
+                                    </SyntaxHighlighter>
+                                </ScrollArea>
                             </div>
                             <div className="grid px-1 h-fit">
                                 <h1 className="text-base font-medium">{snippet.title}</h1>
