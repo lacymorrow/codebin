@@ -295,9 +295,11 @@ const UserProfile = () => {
                                         <Loader2 className='h-5 w-5 animate-spin' />
                                     </div>)}
                                     {error && (
-                                        <div className='p-2 h-44 w-full rounded-md bg-secondary/80 mt-5'>
-                                            <p className='text-foreground font-mono text-sm'>{error?.error}</p>
-                                        </div>
+                                        <ScrollArea className='h-44 w-full rounded-md bg-secondary/80 mt-5'>
+                                            <div className='p-2 h-44 w-full'>
+                                                <p className='text-red-500 font-mono text-sm'>{error?.error}</p>
+                                            </div>
+                                        </ScrollArea>
                                     )}
                                 </CredenzaDescription>
                             </CredenzaHeader>
