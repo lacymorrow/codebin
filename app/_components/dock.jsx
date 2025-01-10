@@ -11,7 +11,7 @@ export default function Dock() {
         { type: "button", title: "Create", href: "/new" },
     ];
     return (
-        <div className="fixed z-50 left-0 right-0 bottom-5 mx-auto w-fit">
+        <div className="fixed z-50 left-0 right-0 bottom-8 mx-auto w-fit">
             <ExpandableTabs tabs={tabs} />
         </div>
     )
