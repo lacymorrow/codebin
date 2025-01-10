@@ -7,7 +7,18 @@ import createSnippet from '@/server_functions/createSnippet';
 import getUserSnippets from '@/server_functions/getUserSnippets';
 import { getCurrentUser } from '@/utils/current-user';
 import { Copy, Edit, Share, Share2 } from 'lucide-react';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const UserProfile = () => {
     const [user, setUser] = useState(null);
@@ -77,7 +88,7 @@ const UserProfile = () => {
             <div className='mt-14 grid gap-4 mb-10'>
                 <h1 className='text-base text-foreground/80'>My Snippets.</h1>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-auto">
-                    {snippets.map((snippet) => (
+                    {snippets && snippets.map((snippet) => (
                         <div
                             key={snippet.id}
                             className="border flex flex-col border-border h-fit bg-card rounded-md p-4 shadow-sm break-inside-avoid"
@@ -93,12 +104,33 @@ const UserProfile = () => {
                                     {snippet.desc ? snippet.desc.slice(0, 70) : "No description"}
                                 </p>
                                 <div className='flex gap-2 items-center mt-2'>
-                                    <Button>Copy <Copy className='h-4 w-4' /></Button>
-                                    <Button size="icon" variant="outline"><Share2 className='h-4 w-4' /></Button>
+                                    <Button onClick={() => { navigator.clipboard.writeText(snippet.code); toast.success('Code copied!') }}>Copy <Copy className='h-4 w-4' /></Button>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button size="icon" variant="outline"><Share2 className='h-4 w-4' /></Button>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle className="text-left">{snippet.title}</DialogTitle>
+                                                <DialogDescription className="text-left">
+                                                    <div className='mt-2 grid gap-2'>
+                                                        <Label htmlFor="link">This is your public link to share:</Label>
+                                                        <Input id="link" defaultValue={`${location.origin}/s/${snippet.id}`} readOnly />
+                                                        <Button onClick={() => { navigator.clipboard.writeText(`${location.origin}/s/${snippet.id}`); toast.success('Link copied!') }}>Copy</Button>
+                                                    </div>
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                        </DialogContent>
+                                    </Dialog>
                                 </div>
                             </div>
                         </div>
                     ))}
+                    {!snippets && (
+                        <div className='flex gap-2 items-center h-64 justify-center border border-border rounded-md'>
+                            <p className='text-foreground/80 text-sm'>No snippets found.</p>
+                        </div>
+                    )}
                 </div>
 
             </div>
