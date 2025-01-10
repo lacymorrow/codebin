@@ -24,13 +24,16 @@ import { LANGUAGE_CONFIG } from "@/app/_constants/config";
 import { toast } from "sonner";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
+    Credenza,
+    CredenzaBody,
+    CredenzaClose,
+    CredenzaContent,
+    CredenzaDescription,
+    CredenzaFooter,
+    CredenzaHeader,
+    CredenzaTitle,
+    CredenzaTrigger,
+} from "@/components/ui/credenza"
 import createSnippet from "@/server_functions/createSnippet";
 import { getCurrentUser } from "@/utils/current-user";
 
@@ -172,14 +175,14 @@ export default function Page() {
                 <div className="flex items-center gap-3 justify-between">
                     <div className="flex items-center gap-2">
                         <Button size="icon" variant="outline" onClick={() => { navigator.clipboard.writeText(code); toast.success("Copied to clipboard!"); }}><Copy className="h-4 w-4" /></Button>
-                        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                            <DialogTrigger asChild>
+                        <Credenza open={dialogOpen} onOpenChange={setDialogOpen}>
+                            <CredenzaTrigger asChild>
                                 <Button>Publish</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle className="text-start">Publishing your snippet!</DialogTitle>
-                                    <DialogDescription className="text-start">
+                            </CredenzaTrigger>
+                            <CredenzaContent>
+                                <CredenzaHeader>
+                                    <CredenzaTitle className="text-start">Publishing your snippet!</CredenzaTitle>
+                                    <CredenzaDescription className="text-start">
                                         <p>Please fill out the form below to publish your snippet</p>
                                         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3 mt-5">
                                             <Label className="-mb-2" htmlFor="title">Title</Label>
@@ -191,10 +194,10 @@ export default function Page() {
                                                 {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : "Publish"}
                                             </Button>
                                         </form>
-                                    </DialogDescription>
-                                </DialogHeader>
-                            </DialogContent>
-                        </Dialog>
+                                    </CredenzaDescription>
+                                </CredenzaHeader>
+                            </CredenzaContent>
+                        </Credenza>
                     </div>
                     <Button size="icon" asChild onClick={executeCode} disabled={running}>
                         <RainbowButton className="!w-10 px-0 py-0 !h-10">
