@@ -32,9 +32,9 @@ export default function Hero() {
             <TechStack />
             <div className="relative rounded-md p-[1px] mt-10 max-w-[800px] mx-auto">
                 <img
-                    src="https://via.placeholder.com/800x450?text=in++development"
-                    alt="Codebin illustration"
-                    className="h-72 sm:h-full max-h-[450px] w-full object-cover rounded-md"
+                    src="/dash-prv.png"
+                    alt="Codebin"
+                    className="border border-border h-72 h-full sm:max-h-[450px] w-full object-fit rounded-md"
                 />
                 <BorderTrail/>
             </div>
