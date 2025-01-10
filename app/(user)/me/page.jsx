@@ -289,12 +289,16 @@ const UserProfile = () => {
                                 <CredenzaDescription className="text-left">
                                     <p>{curSnipData?.desc ? curSnipData?.desc.slice(0, 70) : "No description"}</p>
                                     {output && !runningSnip && (
-                                        <div
-                                            className="text-sm bg-secondary/80 p-2 rounded-md mt-5 h-44 font-mono whitespace-pre-wrap break-words max-w-full"
-                                            style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
-                                        >
-                                            {output?.output}
-                                        </div>
+                                        <ScrollArea className='h-44 p-2 overflow-hidden w-full rounded-md bg-secondary/80 mt-5'>
+
+                                            <div
+                                                className="text-sm rounded-md h-44 font-mono whitespace-pre-wrap break-words max-w-full"
+                                                style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+                                            >
+                                                {output?.output}
+                                            </div>
+                                            <ScrollBar orientation="horizontal" />
+                                        </ScrollArea>
                                     )}
                                     {runningSnip && (<div className='h-44 w-full rounded-md flex items-center justify-center bg-muted mt-5'>
                                         <Loader2 className='h-5 w-5 animate-spin' />
