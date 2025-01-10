@@ -295,7 +295,12 @@ export default function Page() {
                                     </div>
                                 )
                             ) : (
-                                <span className="text-red-500 font-mono text-sm">{error.error}</span>
+                                <div
+                                    className="text-sm font-mono whitespace-pre-wrap break-words max-w-full"
+                                    style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+                                >
+                                    <span className="text-red-500 font-mono text-sm">{error.error}</span>
+                                </div>
                             )}
                             {!error && !output ? !running ? (
                                 <span className="text-sm text-foreground/80">No Output.</span>
