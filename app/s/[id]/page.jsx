@@ -133,7 +133,7 @@ export default function Page({ params }) {
             <Header />
             <div className="px-6 md:px-20 lg:px-32 mb-10">
                 <h1 className="text-lg font-bold">{snip?.title}</h1>
-                <p className="text-sm -mt-0.5 text-foreground/80">{snip?.description ? snip?.description : "No description"}</p>
+                <p className="text-sm -mt-0.5 text-foreground/80">{snip?.desc ? snip?.desc : "No description"}</p>
                 <div className="mt-4">
                     <div className='mb-4 flex items-center gap-2'>
                         <Button size="icon" variant="outline" onClick={() => { navigator.clipboard.writeText(snip?.code); toast.success("Copied to clipboard!") }}><Copy className='h-4 w-4' /></Button>
