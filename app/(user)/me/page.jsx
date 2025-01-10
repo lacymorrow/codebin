@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { oneLight, vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from 'next-themes';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -288,17 +288,26 @@ const UserProfile = () => {
                                 <CredenzaTitle className="text-left">{curSnipData?.title}</CredenzaTitle>
                                 <CredenzaDescription className="text-left">
                                     <p>{curSnipData?.desc ? curSnipData?.desc.slice(0, 70) : "No description"}</p>
-                                    {output && !runningSnip && (<div className='p-2 h-44 w-full rounded-md bg-secondary/80 mt-5'>
-                                        <p className='text-foreground font-mono text-sm'>{output?.output}</p>
-                                    </div>)}
+                                    {output && !runningSnip && (
+                                        <div
+                                            className="text-sm bg-secondary/80 p-2 rounded-md mt-5 h-44 font-mono whitespace-pre-wrap break-words max-w-full"
+                                            style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+                                        >
+                                            {output?.output}
+                                        </div>
+                                    )}
                                     {runningSnip && (<div className='h-44 w-full rounded-md flex items-center justify-center bg-muted mt-5'>
                                         <Loader2 className='h-5 w-5 animate-spin' />
                                     </div>)}
                                     {error && (
-                                        <ScrollArea className='h-44 w-full rounded-md bg-secondary/80 mt-5'>
-                                            <div className='p-2 h-44 w-full'>
-                                                <p className='text-red-500 font-mono text-sm'>{error?.error}</p>
+                                        <ScrollArea className='h-44 overflow-hidden w-full rounded-md bg-secondary/80 mt-5'>
+                                            <div
+                                                className="text-sm bg-secondary/80 p-2 rounded-md text-red-500 h-44 font-mono whitespace-pre-wrap break-words max-w-full"
+                                                style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+                                            >
+                                                {error?.error}
                                             </div>
+                                            <ScrollBar orientation="horizontal" />
                                         </ScrollArea>
                                     )}
                                 </CredenzaDescription>
