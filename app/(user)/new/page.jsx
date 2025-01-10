@@ -208,7 +208,7 @@ export default function Page() {
                                             {errors.title && <span className="text-red-500 text-sm -mt-2">Title is required</span>}
                                             <Label className="-mb-2" htmlFor="description">Description (optional)</Label>
                                             <Textarea id="description" placeholder="e.g: A simple hello world in JavaScript" {...register("description")} />
-                                            {pubId && (
+                                            {/*{pubId && (
                                                 <div className="grid gap-1 mt-2">
                                                     <Label className="text-foreground">Snippet URL Generated!</Label>
                                                     <div className="flex items-center gap-2">
@@ -216,7 +216,7 @@ export default function Page() {
                                                         <Button type="button" size="icon" className="!w-10" onClick={() => { navigator.clipboard.writeText(`${location.origin}/s/${pubId}`); toast.success("Copied to clipboard!"); }}><Copy className="h-4 w-4" /></Button>
                                                     </div>
                                                 </div>
-                                            )}
+                                            )}*/}
                                             <Button disabled={publishing} type="submit" className="w-full">
                                                 {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : "Publish"}
                                             </Button>
@@ -334,7 +334,7 @@ export default function Page() {
                         <AlertDialogDescription>
                             <p className="-mt-2 mb-3">Share this link with anyone.</p>
                             <Label htmlFor="link">Snippet Link</Label>
-                            <Input id="link" className="mt-1" readOnly value={`${location.origin}/s/${pubId}`} />
+                            <Input id="link" className="mt-1" readOnly value={`https://ccodebin.vercel.app/s/${pubId}`} />
                             <div className="grid grid-cols-2 gap-2 mt-3">
                                 <Button onClick={() => { navigator.clipboard.writeText(`https://ccodebin.vercel.app/s/${pubId}`); toast.success("Copied to clipboard!"); }}>Copy</Button>
                                 <Button onClick={() => setShareDialog(false)} variant="outline">Close</Button>
