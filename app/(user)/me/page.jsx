@@ -6,38 +6,70 @@ import { Switch } from '@/components/ui/switch';
 import createSnippet from '@/server_functions/createSnippet';
 import getUserSnippets from '@/server_functions/getUserSnippets';
 import { getCurrentUser } from '@/utils/current-user';
-import { Copy, Edit, Share, Share2 } from 'lucide-react';
+import { Copy, Edit, Loader2, MoreHorizontal, Play, Share, Share2, Trash, Trash2 } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
+    Credenza,
+    CredenzaBody,
+    CredenzaClose,
+    CredenzaContent,
+    CredenzaDescription,
+    CredenzaFooter,
+    CredenzaHeader,
+    CredenzaTitle,
+    CredenzaTrigger,
+} from "@/components/ui/credenza"
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { oneLight, vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from 'next-themes';
-import { lightfair } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { deleteDoc, doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+
 
 const UserProfile = () => {
     const [user, setUser] = useState(null);
+    const [loading, setloading] = useState(false);
     const [snippets, setSnippets] = useState([]);
     const { theme } = useTheme();
 
     const fetchSnippets = async () => {
         if (!user) return;
         try {
+            setloading(true);
             const snippets = await getUserSnippets(user.uid);
             setSnippets(snippets);
             console.log(snippets);
         } catch (error) {
             console.error('Error fetching snippets:', error);
+        }
+        finally {
+            setloading(false);
+        }
+    };
+
+    const deleteSnippet = async (id) => {
+        try {
+            setloading(true);
+            await deleteDoc(doc(db, 'users', user.uid, 'snippets', id));
+            toast.success('Snippet deleted successfully.');
+            fetchSnippets();
+        } catch (error) {
+            console.error('Error deleting snippet:', error);
+        }
+        finally {
+            setloading(false);
         }
     };
 
@@ -111,32 +143,49 @@ const UserProfile = () => {
                                 <p className="text-sm text-foreground/80">
                                     {snippet.desc ? snippet.desc.slice(0, 70) : "No description"}
                                 </p>
-                                <div className='flex gap-2 items-center mt-2'>
-                                    <Button onClick={() => { navigator.clipboard.writeText(snippet.code); toast.success('Code copied!') }}>Copy <Copy className='h-4 w-4' /></Button>
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button size="icon" variant="outline"><Share2 className='h-4 w-4' /></Button>
-                                        </DialogTrigger>
-                                        <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle className="text-left">{snippet.title}</DialogTitle>
-                                                <DialogDescription className="text-left">
-                                                    <div className='mt-2 grid gap-2'>
-                                                        <Label htmlFor="link">This is your public link to share:</Label>
-                                                        <Input id="link" defaultValue={`${location.origin}/s/${snippet.id}`} readOnly />
-                                                        <Button onClick={() => { navigator.clipboard.writeText(`${location.origin}/s/${snippet.id}`); toast.success('Link copied!') }}>Copy</Button>
-                                                    </div>
-                                                </DialogDescription>
-                                            </DialogHeader>
-                                        </DialogContent>
-                                    </Dialog>
+                                <div className='flex gap-2 items-center justify-between mt-2'>
+                                    <div className='flex gap-2 items-center'>
+                                        {/* <Button onClick={() => { navigator.clipboard.writeText(snippet.code); toast.success('Code copied!') }}>Copy <Copy className='h-4 w-4' /></Button> */}
+                                        <Credenza>
+                                            <CredenzaTrigger asChild>
+                                                <Button variant="outline">Share <Share2 className='h-4 w-4' /></Button>
+                                            </CredenzaTrigger>
+                                            <CredenzaContent>
+                                                <CredenzaHeader>
+                                                    <CredenzaTitle className="text-left">{snippet.title}</CredenzaTitle>
+                                                    <CredenzaDescription className="text-left">
+                                                        <div className='mt-2 grid gap-2'>
+                                                            <Label htmlFor="link">This is your public link to share:</Label>
+                                                            <Input id="link" defaultValue={`${location.origin}/s/${snippet.id}`} readOnly />
+                                                            <Button onClick={() => { navigator.clipboard.writeText(`${location.origin}/s/${snippet.id}`); toast.success('Link copied!') }}>Copy</Button>
+                                                        </div>
+                                                    </CredenzaDescription>
+                                                </CredenzaHeader>
+                                            </CredenzaContent>
+                                        </Credenza>
+                                    </div>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button size="icon"><MoreHorizontal className='h-4 w-4' /></Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuItem className="flex gap-2 items-center justify-between" onClick={() => { navigator.clipboard.writeText(snippet.code); toast.success('Code copied!'); }}>Copy <Copy className='h-4 w-4' /></DropdownMenuItem>
+                                            <DropdownMenuItem className="flex gap-2 items-center justify-between">Run <Play className='h-4 w-4' /></DropdownMenuItem>
+                                            <DropdownMenuItem className="flex gap-2 hover:!bg-red-600 hover:!text-red-50 items-center justify-between text-red-500" onClick={() => deleteSnippet(snippet.id)}>Delete <Trash className='h-4 w-4' /></DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                             </div>
                         </div>
                     ))}
-                    {!snippets && (
+                    {!snippets && !loading && (
                         <div className='flex gap-2 items-center h-64 justify-center border border-border rounded-md'>
                             <p className='text-foreground/80 text-sm'>No snippets found.</p>
+                        </div>
+                    )}
+                    {loading && (
+                        <div className='flex gap-2 items-center h-64 justify-center rounded-md'>
+                            <Loader2 className='h-5 w-5 animate-spin' />
                         </div>
                     )}
                 </div>
