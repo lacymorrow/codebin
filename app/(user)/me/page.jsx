@@ -36,6 +36,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { runCode } from '@/app/_constants/runcode';
+import { LANGUAGE_CONFIG } from '@/app/_constants/config';
 
 
 const UserProfile = () => {
@@ -43,6 +45,12 @@ const UserProfile = () => {
     const [loading, setloading] = useState(false);
     const [snippets, setSnippets] = useState([]);
     const { theme } = useTheme();
+    const [run, setRun] = useState(false);
+    const [runDialogOpen, setRunDialogOpen] = useState(false);
+    const [curSnipData, setCurSnipData] = useState(null);
+    const [output, setOutput] = useState(null);
+    const [error, setError] = useState(null);
+    const [runningSnip, setRunningSnip] = useState(false);
 
     const fetchSnippets = async () => {
         if (!user) return;
@@ -71,6 +79,90 @@ const UserProfile = () => {
         finally {
             setloading(false);
         }
+    };
+
+    const executeCode = async (i) => {
+        setError(null);
+        setOutput(null);
+        const code = i.code;
+        try {
+            setRunningSnip(true);
+            const runtime = LANGUAGE_CONFIG[i.language].pistonRuntime;
+            const response = await fetch("https://emkc.org/api/v2/piston/execute", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    language: runtime.language,
+                    version: runtime.version,
+                    files: [{ content: code }],
+                }),
+            });
+
+            const data = await response.json();
+
+            console.log("data back from piston:", data);
+
+            // handle API-level erros
+            if (data.message) {
+                return setOutput({ error: data.message, executionResult: { code, output: "", error: data.message } });
+            }
+
+            // handle compilation errors
+            if (data.compile && data.compile.code !== 0) {
+                const error = data.compile.stderr || data.compile.output;
+                return setError({
+                    error,
+                    executionResult: {
+                        code,
+                        output: "",
+                        error,
+                    },
+                });
+            }
+
+            if (data.run && data.run.code !== 0) {
+                const error = data.run.stderr || data.run.output;
+                return setError({
+                    error,
+                    executionResult: {
+                        code,
+                        output: "",
+                        error,
+                    },
+                });
+            }
+
+            // if we get here, execution was successful
+            const output = data.run.output;
+
+            return setOutput({
+                output: output.trim(),
+                error: null,
+                executionResult: {
+                    code,
+                    output: output.trim(),
+                    error: null,
+                },
+            });
+        } catch (error) {
+            console.log("Error running code:", error);
+            return setError({
+                error: "Error running code",
+                executionResult: { code, output: "", error: "Error running code" },
+            });
+        } finally {
+            setRunningSnip(false);
+            return;
+        }
+    };
+
+    const runCodeSnippet = (data) => {
+        setCurSnipData(null);
+        setCurSnipData(data);
+        setRunDialogOpen(true);
+        executeCode(data);
     };
 
     useEffect(() => {
@@ -170,7 +262,7 @@ const UserProfile = () => {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
                                             <DropdownMenuItem className="flex gap-2 items-center justify-between" onClick={() => { navigator.clipboard.writeText(snippet.code); toast.success('Code copied!'); }}>Copy <Copy className='h-4 w-4' /></DropdownMenuItem>
-                                            <DropdownMenuItem className="flex gap-2 items-center justify-between">Run <Play className='h-4 w-4' /></DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => runCodeSnippet(snippet)} className="flex gap-2 items-center justify-between">Run <Play className='h-4 w-4' /></DropdownMenuItem>
                                             <DropdownMenuItem className="flex gap-2 hover:!bg-red-600 hover:!text-red-50 items-center justify-between text-red-500" onClick={() => deleteSnippet(snippet.id)}>Delete <Trash className='h-4 w-4' /></DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -188,8 +280,30 @@ const UserProfile = () => {
                             <Loader2 className='h-5 w-5 animate-spin' />
                         </div>
                     )}
+                    <Credenza open={runDialogOpen} onOpenChange={setRunDialogOpen}>
+                        <CredenzaTrigger asChild>
+                        </CredenzaTrigger>
+                        <CredenzaContent>
+                            <CredenzaHeader>
+                                <CredenzaTitle className="text-left">{curSnipData?.title}</CredenzaTitle>
+                                <CredenzaDescription className="text-left">
+                                    <p>{curSnipData?.desc ? curSnipData?.desc.slice(0, 70) : "No description"}</p>
+                                    {output && !runningSnip && (<div className='p-2 h-44 w-full rounded-md bg-secondary/80 mt-5'>
+                                        <p className='text-foreground font-mono text-sm'>{output?.output}</p>
+                                    </div>)}
+                                    {runningSnip && (<div className='h-44 w-full rounded-md flex items-center justify-center bg-muted mt-5'>
+                                        <Loader2 className='h-5 w-5 animate-spin' />
+                                    </div>)}
+                                    {error && (
+                                        <div className='p-2 h-44 w-full rounded-md bg-secondary/80 mt-5'>
+                                            <p className='text-foreground font-mono text-sm'>{error?.error}</p>
+                                        </div>
+                                    )}
+                                </CredenzaDescription>
+                            </CredenzaHeader>
+                        </CredenzaContent>
+                    </Credenza>
                 </div>
-
             </div>
         </div>
     );
