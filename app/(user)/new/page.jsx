@@ -336,7 +336,7 @@ export default function Page() {
                             <Label htmlFor="link">Snippet Link</Label>
                             <Input id="link" className="mt-1" readOnly value={`${location.origin}/s/${pubId}`} />
                             <div className="grid grid-cols-2 gap-2 mt-3">
-                                <Button onClick={() => { navigator.clipboard.writeText(`${location.origin}/s/${pubId}`); toast.success("Copied to clipboard!"); }}>Copy</Button>
+                                <Button onClick={() => { navigator.clipboard.writeText(`https://ccodebin.vercel.app/s/${pubId}`); toast.success("Copied to clipboard!"); }}>Copy</Button>
                                 <Button onClick={() => setShareDialog(false)} variant="outline">Close</Button>
                             </div>
                         </AlertDialogDescription>
