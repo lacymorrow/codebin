@@ -36,6 +36,17 @@ import {
 } from "@/components/ui/credenza"
 import createSnippet from "@/server_functions/createSnippet";
 import { getCurrentUser } from "@/utils/current-user";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 
 export default function Page() {
@@ -57,6 +68,7 @@ export default function Page() {
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
     const outputElement = useRef(null);
     const [pubId, setPubId] = useState(null);
+    const [shareDialog, setShareDialog] = useState(false);
 
     const onSubmit = (data) => {
         const title = data.title;
@@ -74,6 +86,7 @@ export default function Page() {
                 setPubId(e);
             });
             newDoc.finally(() => {
+                setShareDialog(true);
                 setDialogOpen(false);
                 setPublishing(false);
             });
@@ -81,6 +94,7 @@ export default function Page() {
         catch (e) {
             setPublishing(false);
             setDialogOpen(false);
+            setShareDialog(true);
             console.log(e);
             toast.error("Error creating snippet!");
         }
@@ -179,7 +193,7 @@ export default function Page() {
                 <div className="flex items-center gap-3 justify-between">
                     <div className="flex items-center gap-2">
                         <Button size="icon" variant="outline" onClick={() => { navigator.clipboard.writeText(code); toast.success("Copied to clipboard!"); }}><Copy className="h-4 w-4" /></Button>
-                        <Credenza>
+                        <Credenza open={dialogOpen} onOpenChange={setDialogOpen}>
                             <CredenzaTrigger asChild>
                                 <Button>Publish</Button>
                             </CredenzaTrigger>
@@ -278,7 +292,7 @@ export default function Page() {
                     <div className="mt-5 sm:mt-0 shadow-sm max-w-full">
                         <div className="bg-muted/20 border border-border flex items-center justify-between px-3 py-1 rounded-b-none rounded-sm">
                             <h1 className="text-sm text-foreground/80">Code Output</h1>
-                            <Copy className="!h-3 !w-3" onClick={() => {navigator.clipboard.writeText(output?.output || error.error); toast.success("Copied to clipboard!");}}/>
+                            <Copy className="!h-3 !w-3" onClick={() => { navigator.clipboard.writeText(output?.output || error.error); toast.success("Copied to clipboard!"); }} />
                         </div>
                         <ScrollArea
                             className="overflow-x-scroll scrollbar-hidden rounded-sm p-3 border border-border border-t-0 h-60 sm:h-[366px] bg-secondary/40 rounded-t-none w-full max-w-full"
@@ -313,6 +327,22 @@ export default function Page() {
                     </div>
                 </div>
             </div>
-        </div >
+            <AlertDialog open={shareDialog} onOpenChange={setShareDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader className="text-left">
+                        <AlertDialogTitle>Snipped Link Generated!</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            <p className="-mt-2 mb-3">Share this link with anyone.</p>
+                            <Label htmlFor="link">Snippet Link</Label>
+                            <Input id="link" className="mt-1" readOnly value={`${location.origin}/s/${pubId}`} />
+                            <div className="grid grid-cols-2 gap-2 mt-3">
+                                <Button onClick={() => { navigator.clipboard.writeText(`${location.origin}/s/${pubId}`); toast.success("Copied to clipboard!"); }}>Copy</Button>
+                                <Button onClick={() => setShareDialog(false)} variant="outline">Close</Button>
+                            </div>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                </AlertDialogContent>
+            </AlertDialog>
+        </div>
     );
 }
