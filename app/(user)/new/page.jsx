@@ -18,7 +18,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TbBrandCpp } from "react-icons/tb";
 import { LANGUAGE_CONFIG } from "@/app/_constants/config";
 import { toast } from "sonner";
@@ -31,6 +31,8 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import createSnippet from "@/server_functions/createSnippet";
+import { getCurrentUser } from "@/utils/current-user";
 
 
 export default function Page() {
@@ -46,12 +48,40 @@ export default function Page() {
     const [output, setOutput] = useState(null);
     const [error, setError] = useState(null);
     const [running, setRunning] = useState(false);
+    const [user, setUser] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [publishing, setPublishing] = useState(false);
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
     const outputElement = useRef(null);
 
     const onSubmit = (data) => {
-        console.log(data)
+        const title = data.title;
+        const desc = data.description;
+        if (!code) return toast.error("Please write some code!");
+        const uId = user.uid;
+        try {
+            setPublishing(true);
+            const newDoc = createSnippet(uId, { title, desc, code, language: selectedLanguage.straightName.toLowerCase() });
+            newDoc.then(() => {
+                toast.success("Snippet created successfully!");
+                setCode(null);
+            });
+            newDoc.finally(() => {
+                setDialogOpen(false);
+                setPublishing(false);
+            });
+        }
+        catch (e) {
+            setPublishing(false);
+            setDialogOpen(false);
+            console.log(e);
+            toast.error("Error creating snippet!");
+        }
     };
+
+    useEffect(() => {
+        getCurrentUser(setUser);
+    }, []);
 
     const executeCode = async () => {
         if (!code) {
@@ -142,7 +172,7 @@ export default function Page() {
                 <div className="flex items-center gap-3 justify-between">
                     <div className="flex items-center gap-2">
                         <Button size="icon" variant="outline" onClick={() => { navigator.clipboard.writeText(code); toast.success("Copied to clipboard!"); }}><Copy className="h-4 w-4" /></Button>
-                        <Dialog>
+                        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                             <DialogTrigger asChild>
                                 <Button>Publish</Button>
                             </DialogTrigger>
@@ -154,10 +184,11 @@ export default function Page() {
                                         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3 mt-5">
                                             <Label className="-mb-2" htmlFor="title">Title</Label>
                                             <Input id="title" placeholder="e.g: Hello World in JavaScript" {...register("title", { required: true })} />
-                                            <Label className="-mb-2" htmlFor="description">Description</Label>
+                                            {errors.title && <span className="text-red-500 text-sm -mt-2">Title is required</span>}
+                                            <Label className="-mb-2" htmlFor="description">Description (optional)</Label>
                                             <Textarea id="description" placeholder="e.g: A simple hello world in JavaScript" {...register("description")} />
-                                            <Button type="submit" className="w-full">
-                                                Publish
+                                            <Button disabled={publishing} type="submit" className="w-full">
+                                                {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : "Publish"}
                                             </Button>
                                         </form>
                                     </DialogDescription>
