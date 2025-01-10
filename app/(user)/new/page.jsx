@@ -56,6 +56,7 @@ export default function Page() {
     const [publishing, setPublishing] = useState(false);
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
     const outputElement = useRef(null);
+    const [pubId, setPubId] = useState(null);
 
     const onSubmit = (data) => {
         const title = data.title;
@@ -65,9 +66,12 @@ export default function Page() {
         try {
             setPublishing(true);
             const newDoc = createSnippet(uId, { title, desc, code, language: selectedLanguage.straightName.toLowerCase() });
-            newDoc.then(() => {
+            newDoc.then((e) => {
+                setPubId(null);
                 toast.success("Snippet created successfully!");
                 setCode(null);
+                setOutput(null);
+                setPubId(e);
             });
             newDoc.finally(() => {
                 setDialogOpen(false);
@@ -175,7 +179,7 @@ export default function Page() {
                 <div className="flex items-center gap-3 justify-between">
                     <div className="flex items-center gap-2">
                         <Button size="icon" variant="outline" onClick={() => { navigator.clipboard.writeText(code); toast.success("Copied to clipboard!"); }}><Copy className="h-4 w-4" /></Button>
-                        <Credenza open={dialogOpen} onOpenChange={setDialogOpen}>
+                        <Credenza>
                             <CredenzaTrigger asChild>
                                 <Button>Publish</Button>
                             </CredenzaTrigger>
@@ -190,6 +194,15 @@ export default function Page() {
                                             {errors.title && <span className="text-red-500 text-sm -mt-2">Title is required</span>}
                                             <Label className="-mb-2" htmlFor="description">Description (optional)</Label>
                                             <Textarea id="description" placeholder="e.g: A simple hello world in JavaScript" {...register("description")} />
+                                            {pubId && (
+                                                <div className="grid gap-1 mt-2">
+                                                    <Label className="text-foreground">Snippet URL Generated!</Label>
+                                                    <div className="flex items-center gap-2">
+                                                        <Input readOnly value={`${location.origin}/s/${pubId}`} />
+                                                        <Button type="button" size="icon" className="!w-10" onClick={() => { navigator.clipboard.writeText(`${location.origin}/s/${pubId}`); toast.success("Copied to clipboard!"); }}><Copy className="h-4 w-4" /></Button>
+                                                    </div>
+                                                </div>
+                                            )}
                                             <Button disabled={publishing} type="submit" className="w-full">
                                                 {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : "Publish"}
                                             </Button>

@@ -11,6 +11,7 @@ export default async function createSnippet(id, dataa) {
     try {
         const newSnippetRef = await addDoc(snippetsCollectionRef, dataa);
         console.log('Snippet created with ID:', newSnippetRef.id);
+        return newSnippetRef.id;
     } catch (error) {
         console.error('Error adding snippet:', error);
     }
