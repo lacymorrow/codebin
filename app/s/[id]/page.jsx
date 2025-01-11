@@ -5,7 +5,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import Header from "@/components/page/header";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Copy, Loader2, Play } from 'lucide-react';
@@ -26,6 +26,8 @@ export default function Page({ params }) {
     const [loading, setLoading] = useState(true);
     const [notValid, setNotValid] = useState(false);
     const { theme } = useTheme();
+    const outputElement = useRef(null);
+
 
     const getSnip = async (id) => {
         try {
@@ -120,6 +122,9 @@ export default function Page({ params }) {
             });
         } finally {
             setRunning(false);
+            if (outputElement.current) {
+                outputElement.current.scrollIntoView({ behavior: "smooth" });
+            }
             return;
         }
     };
@@ -231,6 +236,7 @@ export default function Page({ params }) {
                             ) : ""}
                             <ScrollBar orientation="horizontal" />
                         </ScrollArea>
+                        <div ref={outputElement} className="sm:hidden"></div>
                     </div>
                 </div>
             </div>

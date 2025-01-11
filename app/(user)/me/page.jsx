@@ -38,6 +38,7 @@ import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { runCode } from '@/app/_constants/runcode';
 import { LANGUAGE_CONFIG } from '@/app/_constants/config';
+import { Badge } from '@/components/ui/badge';
 
 
 const UserProfile = () => {
@@ -70,16 +71,17 @@ const UserProfile = () => {
     const deleteSnippet = async (id) => {
         try {
             setloading(true);
-            await deleteDoc(doc(db, 'users', user.uid, 'snippets', id));
+            await deleteDoc(doc(db, 'snippets', id));
             toast.success('Snippet deleted successfully.');
             fetchSnippets();
         } catch (error) {
             console.error('Error deleting snippet:', error);
-        }
-        finally {
+            toast.error('Failed to delete the snippet.');
+        } finally {
             setloading(false);
         }
     };
+
 
     const executeCode = async (i) => {
         setError(null);
@@ -189,7 +191,7 @@ const UserProfile = () => {
                 </div>
                 <div className='mt-14 grid gap-4 mb-10'>
                     <h1 className='text-base text-foreground/80'>My Snippets.</h1>
-                    <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
+                    <div className='grid sm:grid-cols-2 lg:grid-cols-3 gap-3'>
                         {[...Array(10)].map((_, i) => (
                             <Skeleton key={i} className='w-full sm:max-w-48 h-48' />
                         ))}
@@ -206,9 +208,7 @@ const UserProfile = () => {
                 <div className='h-full'>
                     <h1 className='text-lg'>Welcome, <span className='font-bold font-geist'>{user.displayName}</span></h1>
                     <div className='flex items-center gap-3'>
-                        <h1 className='text-sm text-foreground/80'>0 Snippets</h1>
-                        <h1 className='text-sm text-foreground/80'>0 Views</h1>
-                        <h1 className='text-sm text-foreground/80'>0 Likes</h1>
+                        <h1 className='text-sm text-foreground/80'>{snippets.length || 0} Snippets Shared</h1>
                     </div>
                     <div className='mt-2 flex gap-2 items-center'>
                         <Button>Share <Share2 className='h-4 w-4' /></Button>
@@ -223,7 +223,7 @@ const UserProfile = () => {
                             key={snippet.id}
                             className="border flex flex-col border-border h-fit bg-card rounded-md p-4 shadow-sm overflow-hidden"
                         >
-                            <div className="rounded-md mb-5">
+                            <div className="rounded-md mb-4">
                                 <ScrollArea className='scrollbar-hidden h-40 rounded-md overflow-hidden'>
                                     <SyntaxHighlighter language={snippet.language} style={theme === 'dark' ? vscDarkPlus : oneLight} wrapLines customStyle={{ margin: 0, padding: '10px', borderRadius: '8px', overflow: 'hidden', width: '100%', overflowX: 'hidden', overflowY: 'hidden', fontSize: '13px', minHeight: '150px' }}>
                                         {snippet.code}
@@ -231,6 +231,9 @@ const UserProfile = () => {
                                 </ScrollArea>
                             </div>
                             <div className="grid px-1 h-fit">
+                                <div className='mb-2'>
+                                    <Badge>{snippet.language}</Badge>
+                                </div>
                                 <h1 className="text-base font-medium">{snippet.title}</h1>
                                 <p className="text-sm text-foreground/80">
                                     {snippet.desc ? snippet.desc.slice(0, 70) : "No description"}
@@ -270,7 +273,7 @@ const UserProfile = () => {
                             </div>
                         </div>
                     ))}
-                    {!snippets && !loading && (
+                    {(!snippets[0] && !loading) && (
                         <div className='flex gap-2 items-center h-64 justify-center border border-border rounded-md'>
                             <p className='text-foreground/80 text-sm'>No snippets found.</p>
                         </div>
