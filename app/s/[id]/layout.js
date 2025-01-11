@@ -11,7 +11,7 @@ export const generateMetadata = async ({ params }) => {
             const data = docSnap.data();
             return {
                 title: data.title,
-                description: data.description || "Share code with output and syntax highlighting with ease.",
+                description: data.desc || "Share code with output and syntax highlighting with ease.",
             }
         } else {
             return {
