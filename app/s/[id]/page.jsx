@@ -4,8 +4,7 @@ import { oneLight, vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import Header from "@/components/page/header";
 import { db } from "@/lib/firebase";
-import { getCurrentUser } from "@/utils/current-user";
-import { collection, doc, getDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
@@ -16,31 +15,35 @@ import { LANGUAGE_CONFIG } from '@/app/_constants/config';
 import Footer from '@/components/page/footer';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
+import Link from 'next/link';
 
 export default function Page({ params }) {
-    const [user, setUser] = useState(null);
     const [snip, setSnip] = useState(null);
     const [output, setOutput] = useState(null);
     const [error, setError] = useState(null);
     const [running, setRunning] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [notValid, setNotValid] = useState(false);
     const { theme } = useTheme();
 
     const getSnip = async (id) => {
         try {
-            const userRef = doc(db, 'users', id);
-            const snipRef = doc(collection(userRef, 'snippets'), params.id);
-
+            setLoading(true);
+            const snipRef = doc(db, 'snippets', params.id); // Fetch snippet directly from the root-level 'snippets' collection
             const docSnap = await getDoc(snipRef);
 
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 setSnip(data);
-                console.log("Snippet data:", data);
             } else {
-                console.log("No such document!");
+                setNotValid(true);
             }
         } catch (error) {
-            console.error("Error fetching document:", error);
+            console.error(error);
+        }
+        finally {
+            setLoading(false);
         }
     };
 
@@ -67,7 +70,7 @@ export default function Page({ params }) {
 
             console.log("data back from piston:", data);
 
-            // handle API-level erros
+            // handle API-level errors
             if (data.message) {
                 return setOutput({ error: data.message, executionResult: { code, output: "", error: data.message } });
             }
@@ -122,12 +125,56 @@ export default function Page({ params }) {
     };
 
     useEffect(() => {
-        getCurrentUser(setUser);
+        getSnip();
     }, []);
-    useEffect(() => {
-        getSnip(user?.uid);
-    }, [user]);
 
+    if (loading) {
+        return (
+            <div>
+                <Header />
+                <div className="px-6 md:px-20 lg:px-32 mb-10">
+                    <div className='grid gap-2'>
+                        <Skeleton className="h-4 w-40" />
+                        <Skeleton className="h-4 w-52" />
+                    </div>
+                    <div className='flex mt-4 gap-2 items-center'>
+                        <Skeleton className="h-10 w-10" />
+                        <Skeleton className="h-10 w-24" />
+                    </div>
+                    <div className='mt-5 grid gap-4'>
+                        <Skeleton className="h-64 w-full" />
+                        <Skeleton className="h-40 w-full" />
+                    </div>
+                </div>
+                <Footer />
+            </div>
+        )
+    };
+    if (notValid) {
+        return (
+            <div className='relative'>
+                <img
+                    src="/bg_gradient.avif"
+                    className="absolute w-full -z-50 -top-0"
+                />
+                <Header />
+                <div className="px-6 md:px-20 lg:px-32 mt-32 h-[300px]">
+                    <div className='text-center grid place-items-center'>
+                        <h1 className="text-3xl mb-2 font-medium">Snippet not found</h1>
+                        <p className="text-sm -mt-0.5 text-foreground/80">The snippet you are looking for does not exist or has been deleted.</p>
+                        <p className="text-sm -mt-0.5 text-foreground/80">Please check the URL and try again.</p>
+                        <div className='mt-4 grid-cols-2 grid gap-2'>
+                            <Button asChild>
+                                <Link href="/">Go Home</Link>
+                            </Button>
+                            <Button variant="outline" onClick={() => getSnip()}>Refresh</Button>
+                        </div>
+                    </div>
+                </div>
+                <Footer />
+            </div>
+        )
+    }
     return (
         <div>
             <Header />
@@ -135,7 +182,7 @@ export default function Page({ params }) {
                 <h1 className="text-lg font-bold">{snip?.title}</h1>
                 <p className="text-sm -mt-0.5 text-foreground/80">{snip?.desc ? snip?.desc : "No description"}</p>
                 <div className="mt-4">
-                    <div className='mb-4 flex items-center gap-2'>
+                    <div className='mb-6 flex items-center gap-2'>
                         <Button size="icon" variant="outline" onClick={() => { navigator.clipboard.writeText(snip?.code); toast.success("Copied to clipboard!") }}><Copy className='h-4 w-4' /></Button>
                         <Button disabled={running} asChild onClick={() => executeCode(snip)}>
                             <RainbowButton>Run {running ? <Loader2 className="animate-spin h-4 w-4" /> : <Play className="h-4 w-4" />}</RainbowButton>
@@ -145,16 +192,15 @@ export default function Page({ params }) {
                         <ScrollArea className='min-h-40 rounded-md'>
                             <SyntaxHighlighter
                                 language={snip?.language}
-                                style={theme === "dark" ? vscDarkPlus : oneLight}
-                                customStyle={{ margin: 0, padding: '10px', borderRadius: '8px', width: '100%', overflowX: 'hidden', overflowY: 'hidden', fontSize: '14px', minHeight: '150px', height: '100%' }}
+                                style={theme !== "light" ? vscDarkPlus : oneLight}
+                                customStyle={{ margin: 0, padding: '10px', borderRadius: '8px', width: '100%', overflowX: 'hidden', overflowY: 'hidden', fontSize: '14px', minHeight: '256px', height: '100%' }}
                             >
                                 {snip?.code}
                             </SyntaxHighlighter>
                             <ScrollBar orientation="horizontal" />
                         </ScrollArea>
                         <ScrollArea
-                            className={cn("overflow-x-scroll mt-6 sm:mt-0 scrollbar-hidden rounded-sm p-3 border border-border h-60 sm:h-[366px] bg-secondary/40 w-full max-w-full", running && "flex items-center justify-center", !output && "flex items-center justify-center", !error && "flex items-center justify-center")}
-                        >
+                            className={"relative overflow-x-scroll mt-3 sm:mt-0 scrollbar-hidden rounded-sm p-3 border border-border h-60 sm:h-[366px] bg-secondary/40 w-full max-w-full"}>
                             {!error ? (
                                 output?.error ? (
                                     <span className="text-red-500 font-mono text-sm">{output.error}</span>
@@ -175,9 +221,13 @@ export default function Page({ params }) {
                                 </div>
                             )}
                             {!error && !output ? !running ? (
-                                <span className="text-sm text-foreground/80">No Output.</span>
+                                <div className='h-full w-full z-10 flex items-center justify-center absolute top-0 left-0 right-0'>
+                                    <span className="text-sm text-foreground/80">No Output.</span>
+                                </div>
                             ) : (
-                                <Loader2 className="animate-spin h-4 w-4" />
+                                <div className='h-full w-full z-10 flex items-center justify-center absolute top-0 left-0 right-0'>
+                                    <Loader2 className="animate-spin h-4 w-4" />
+                                </div>
                             ) : ""}
                             <ScrollBar orientation="horizontal" />
                         </ScrollArea>
