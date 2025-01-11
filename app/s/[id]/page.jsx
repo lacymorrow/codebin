@@ -181,7 +181,11 @@ export default function Page({ params }) {
         )
     }
     return (
-        <div>
+        <div className='relative'>
+            <img
+                src="/bg_gradient.avif"
+                className="absolute w-full -z-50 -top-0"
+            />
             <Header />
             <div className="px-6 md:px-20 lg:px-32 mb-10">
                 <h1 className="text-lg font-bold">{snip?.title}</h1>
