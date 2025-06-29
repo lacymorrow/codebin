@@ -23,9 +23,9 @@ export default function Hero() {
                     Codebin makes sharing code snippets with output simple. Whether you're a developer or not, you can view and share syntax-highlighted snippets effortlessly.
                 </p>
                 <div className="flex gap-3 mt-4">
-                    <GetStartedBtn/>
-                    <Link href="https://github.com/r2hu1/codebin">
-                        <Button variant="outline">Github <Stars className="h-4 w-4" /></Button>
+                    <GetStartedBtn />
+                    <Link href="/s/tFOrJEARI2SbxKQR92PF">
+                        <Button variant="outline">View Demo <Stars className="h-4 w-4" /></Button>
                     </Link>
                 </div>
             </div>
@@ -36,7 +36,7 @@ export default function Hero() {
                     alt="Codebin"
                     className="border border-border h-72 h-full sm:max-h-[450px] w-full object-fit rounded-md"
                 />
-                <BorderTrail/>
+                <BorderTrail />
             </div>
         </div>
     );

@@ -195,7 +195,7 @@ export default function Page() {
                         <Button size="icon" variant="outline" onClick={() => { navigator.clipboard.writeText(code); toast.success("Copied to clipboard!"); }}><Copy className="h-4 w-4" /></Button>
                         <Credenza open={dialogOpen} onOpenChange={setDialogOpen}>
                             <CredenzaTrigger asChild>
-                                <Button>Publish</Button>
+                                <Button>Share</Button>
                             </CredenzaTrigger>
                             <CredenzaContent>
                                 <CredenzaHeader>
@@ -235,7 +235,7 @@ export default function Page() {
                 <div className="md:grid grid:columns-3xl md:grid-cols-2 md:gap-5">
                     <div className="rounded-sm shadow-sm overflow-hidden">
                         <div className="bg-muted/20 border border-border flex items-center justify-between px-3 py-1 rounded-b-none rounded-sm">
-                            <h1 className="text-sm">Code Editor</h1>
+                            <h1 className="text-sm">Index</h1>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button className="text-sm px-3 h-7">{selectedLanguage.icon}{selectedLanguage.name} <ChevronDown className="h-3 w-3" /></Button>
