@@ -56,6 +56,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const { resolvedTheme: theme } = useTheme();
@@ -98,6 +99,7 @@ export default function Page() {
   const outputElement = useRef(null);
   const [pubId, setPubId] = useState(null);
   const [shareDialog, setShareDialog] = useState(false);
+  const router = useRouter();
 
   const onSubmit = (data) => {
     const title = data.title;
@@ -115,6 +117,7 @@ export default function Page() {
       newDoc.then((e) => {
         setPubId(null);
         toast.success("Snippet created successfully!");
+        router.push(`/edit/${e}`);
         setCode(null);
         setOutput(null);
         setPubId(e);

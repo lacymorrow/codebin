@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 export default async function updateSnippet(
   snipId,
@@ -10,8 +10,15 @@ export default async function updateSnippet(
   const snippetDocRef = doc(db, "snippets", snipId);
 
   try {
+    const snippetSnap = await getDoc(snippetDocRef);
+    if (!snippetSnap.exists()) {
+      return null;
+    }
+    const existingSnippet = snippetSnap.data();
+    if (existingSnippet.author !== author) {
+      return null;
+    }
     await updateDoc(snippetDocRef, {
-      author,
       title,
       desc,
       code,
@@ -20,6 +27,6 @@ export default async function updateSnippet(
     return snipId;
   } catch (error) {
     console.error("Error updating snippet:", error);
-    throw error;
+    return error;
   }
 }

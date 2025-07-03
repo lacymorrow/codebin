@@ -43,20 +43,26 @@ export default function Page({ params }) {
   const getSnip = async (id) => {
     try {
       setLoading(true);
-      const snipRef = doc(db, "snippets", params.id); // Fetch snippet directly from the root-level 'snippets' collection
+      const snipRef = doc(db, "snippets", id);
       const docSnap = await getDoc(snipRef);
-
+      console.log(docSnap);
       if (docSnap.exists()) {
         const data = docSnap.data();
+        if (data.author !== user.uid) {
+          toast.error("Unauthorized: You are not the author of this snippet");
+          setNotValid(true);
+          return;
+        }
         setSnip(data);
         setTitle(data.title);
         setDesc(data.desc);
         setCode(data.code);
       } else {
         setNotValid(true);
+        toast.error("Snippet not found with ID:", id);
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -166,11 +172,12 @@ export default function Page({ params }) {
   };
 
   useEffect(() => {
-    getSnip();
-  }, [user]);
-  useEffect(() => {
     getCurrentUser(setUser);
   }, []);
+
+  useEffect(() => {
+    getSnip(params.id);
+  }, [user]);
 
   if (loading) {
     return (
@@ -196,14 +203,14 @@ export default function Page({ params }) {
         <div className="text-center grid place-items-center">
           <h1 className="text-3xl mb-2 font-medium">Snippet not found</h1>
           <p className="text-sm -mt-0.5 text-foreground/80">
-            The snippet you are looking for does not exist or has been deleted.
+            The snippet you are looking for does not exist or you didn't own it.
           </p>
           <p className="text-sm -mt-0.5 text-foreground/80">
             Please check the URL and try again.
           </p>
           <div className="mt-4 grid-cols-2 grid gap-2">
             <Button asChild>
-              <Link href="/">Go Home</Link>
+              <Link href="/me">Go Dashboard</Link>
             </Button>
             <Button variant="outline" onClick={() => getSnip()}>
               Refresh
