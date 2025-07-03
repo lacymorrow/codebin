@@ -441,13 +441,13 @@ export default function Page() {
                 id="link"
                 className="mt-1"
                 readOnly
-                value={`${location.origin}/s/${pubId}`}
+                value={`https://ccodebin.vercel.app/s/${pubId}`}
               />
               <div className="grid grid-cols-2 gap-2 mt-3">
                 <Button
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      `${location.origin}/s/${pubId}`,
+                      `https://ccodebin.vercel.app/s/${pubId}`,
                     );
                     toast.success("Copied to clipboard!");
                     router.push(`/edit/${pubId}`);
