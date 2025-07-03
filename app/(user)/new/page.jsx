@@ -117,7 +117,7 @@ export default function Page() {
       newDoc.then((e) => {
         setPubId(null);
         toast.success("Snippet created successfully!");
-        router.push(`/edit/${e}`);
+        
         setCode(null);
         setOutput(null);
         setPubId(e);
@@ -450,6 +450,7 @@ export default function Page() {
                       `https://ccodebin.vercel.app/s/${pubId}`,
                     );
                     toast.success("Copied to clipboard!");
+                    router.push(`/edit/${e}`);
                   }}
                 >
                   Copy
