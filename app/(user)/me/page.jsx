@@ -196,27 +196,8 @@ const UserProfile = () => {
 
   if (!user) {
     return (
-      <div className="px-6 md:px-20 lg:px-32">
-        <div className="flex gap-4">
-          <Skeleton className="w-24 h-24" />
-          <div className="h-full grid gap-2">
-            <Skeleton className="w-36 h-4" />
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-5 w-8" />
-              <Skeleton className="h-5 w-8" />
-              <Skeleton className="h-5 w-8" />
-            </div>
-            <Skeleton className="h-9 w-32" />
-          </div>
-        </div>
-        <div className="mt-14 grid gap-4 mb-10">
-          <h1 className="text-base text-foreground/80">My Snippets.</h1>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {[...Array(10)].map((_, i) => (
-              <Skeleton key={i} className="w-full sm:max-w-48 h-48" />
-            ))}
-          </div>
-        </div>
+      <div className="fixed top-0 left-0 right-0 h-full w-full bg-background flex items-center justify-center z-[99999]">
+        <Loader2 className="h-5 w-5 animate-spin"/>
       </div>
     );
   }
