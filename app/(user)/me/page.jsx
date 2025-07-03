@@ -255,7 +255,7 @@ const UserProfile = () => {
             snippets.map((snippet) => (
               <div
                 key={snippet.id}
-                className="border flex flex-col border-border h-fit bg-card rounded-md p-2 shadow-sm overflow-hidden"
+                className="border flex flex-col border-border h-full bg-card rounded-md p-2 shadow-sm overflow-hidden"
               >
                 <div className="rounded-md mb-4">
                   <ScrollArea className="scrollbar-hidden h-40 rounded-md overflow-hidden">

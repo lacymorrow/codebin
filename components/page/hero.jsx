@@ -30,11 +30,11 @@ export default function Hero() {
                 </div>
             </div>
             <TechStack />
-            <div className="relative rounded-md p-[1px] mt-10 max-w-[800px] mx-auto">
+            <div className="relative rounded-md p-[1px] mt-10 max-w-6xl w-full mx-auto">
                 <img
                     src="/dash-prv.png"
                     alt="Codebin"
-                    className="border border-border h-72 h-full sm:max-h-[450px] w-full object-fit rounded-md"
+                    className="border border-border h-full w-full object-fit rounded-md"
                 />
                 <BorderTrail />
             </div>
