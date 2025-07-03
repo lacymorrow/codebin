@@ -243,7 +243,7 @@ export default function Page({ params }) {
               size="icon"
               variant="outline"
               onClick={() => {
-                navigator.clipboard.writeText(snip?.code);
+                navigator.clipboard.writeText(`${location.origin}/s/${params.id}`);
                 toast.success("Copied to clipboard!");
               }}
             >
