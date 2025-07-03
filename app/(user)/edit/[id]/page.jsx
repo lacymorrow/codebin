@@ -20,6 +20,10 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { Editor } from "@monaco-editor/react";
+import { Save } from "lucide-react";
+import updateSnippet from "@/server_functions/updateSnippet";
+import { getCurrentUser } from "@/utils/current-user";
 
 export default function Page({ params }) {
   const [snip, setSnip] = useState(null);
@@ -27,9 +31,14 @@ export default function Page({ params }) {
   const [error, setError] = useState(null);
   const [running, setRunning] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
   const [notValid, setNotValid] = useState(false);
-  const { theme } = useTheme();
+  const [code, setCode] = useState("");
+  const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
+  const { resolvedTheme: theme } = useTheme();
   const outputElement = useRef(null);
+  const [user, setUser] = useState(null);
 
   const getSnip = async (id) => {
     try {
@@ -40,6 +49,9 @@ export default function Page({ params }) {
       if (docSnap.exists()) {
         const data = docSnap.data();
         setSnip(data);
+        setTitle(data.title);
+        setDesc(data.desc);
+        setCode(data.code);
       } else {
         setNotValid(true);
       }
@@ -53,7 +65,7 @@ export default function Page({ params }) {
   const executeCode = async (snipdata) => {
     setError(null);
     setOutput(null);
-    const code = snipdata.code;
+    const codex = code || snipdata?.code;
     try {
       setRunning(true);
       const runtime = LANGUAGE_CONFIG[snipdata.language].pistonRuntime;
@@ -65,7 +77,7 @@ export default function Page({ params }) {
         body: JSON.stringify({
           language: runtime.language,
           version: runtime.version,
-          files: [{ content: code }],
+          files: [{ content: codex }],
         }),
       });
 
@@ -133,8 +145,31 @@ export default function Page({ params }) {
     }
   };
 
+  const handleUpdateSnippet = async () => {
+    setUpdating(true);
+    try {
+      await updateSnippet(params.id, {
+        author: user?.uid,
+        code: code,
+        title: title,
+        desc: desc,
+      });
+      console.log("Snippet updated with ID:", params.id);
+      setUpdating(false);
+      toast.success("Snippet updated successfully");
+    } catch (error) {
+      console.error("Error updating snippet:", error);
+      toast.error("Error updating snippet");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   useEffect(() => {
     getSnip();
+  }, [user]);
+  useEffect(() => {
+    getCurrentUser(setUser);
   }, []);
 
   if (loading) {
@@ -180,54 +215,100 @@ export default function Page({ params }) {
   }
   return (
     <div className="px-6 md:px-20 lg:px-32 mb-10">
-      <h1 className="text-lg font-bold">{snip?.title}</h1>
-      <p className="text-sm -mt-0.5 text-foreground/80">
+      <h1
+        contentEditable
+        onInput={(e) => setTitle(e.target.innerText)}
+        className="text-lg font-bold"
+      >
+        {snip?.title}
+      </h1>
+      <p
+        contentEditable
+        onInput={(e) => setDesc(e.target.innerText)}
+        className="text-sm -mt-0.5 text-foreground/80"
+      >
         {snip?.desc ? snip?.desc : "No description"}
       </p>
       <div className="mt-4">
-        <div className="mb-6 flex items-center gap-2">
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => {
-              navigator.clipboard.writeText(snip?.code);
-              toast.success("Copied to clipboard!");
-            }}
-          >
-            <Copy className="h-4 w-4" />
-          </Button>
-          <Button disabled={running} asChild onClick={() => executeCode(snip)}>
+        <div className="flex items-start justify-between">
+          <div className="mb-6 flex items-center gap-2">
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(snip?.code);
+                toast.success("Copied to clipboard!");
+              }}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+            <Button
+              disabled={running}
+              asChild
+              onClick={() => executeCode(snip)}
+            >
+              <RainbowButton>
+                Run{" "}
+                {running ? (
+                  <Loader2 className="animate-spin h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+              </RainbowButton>
+            </Button>
+          </div>
+          <Button disabled={updating} asChild onClick={handleUpdateSnippet}>
             <RainbowButton>
-              Run{" "}
-              {running ? (
-                <Loader2 className="animate-spin h-4 w-4" />
+              Save{" "}
+              {!updating ? (
+                <Save className="h-4 w-4" />
               ) : (
-                <Play className="h-4 w-4" />
+                <Loader2 className="animate-spin h-4 w-4" />
               )}
             </RainbowButton>
           </Button>
         </div>
         <div className="sm:grid grid-cols-2 gap-4">
-          <ScrollArea className="min-h-40 rounded-md">
-            <SyntaxHighlighter
-              language={snip?.language}
-              style={theme !== "light" ? vscDarkPlus : oneLight}
-              customStyle={{
-                margin: 0,
-                padding: "10px",
-                borderRadius: "8px",
-                width: "100%",
-                overflowX: "hidden",
-                overflowY: "hidden",
-                fontSize: "14px",
-                minHeight: "256px",
-                height: "100%",
-              }}
-            >
-              {snip?.code}
-            </SyntaxHighlighter>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
+          <div className="rounded-sm shadow-sm overflow-hidden">
+            <div className="bg-muted/20 border border-border flex items-center justify-between px-3 py-1 rounded-b-none rounded-sm">
+              <h1 className="text-sm">Editing {snip?.title}</h1>
+            </div>
+            <div className="rounded-sm rounded-t-none border border-border border-t-0 overflow-hidden">
+              <Editor
+                height="420px"
+                width="100%"
+                loading={<Loader2 className="h-5 w-5 animate-spin" />}
+                value={snip?.code}
+                onChange={(data) => setCode(data)}
+                language={snip?.language}
+                theme={theme === "dark" ? "vs-dark" : ""}
+                options={{
+                  minimap: {
+                    enabled: false,
+                  },
+                  wrappingIndent: "none",
+                  wordWrap: "off",
+                  fontSize: 14,
+                  scrollBeyondLastLine: false,
+                  automaticLayout: true,
+                  padding: {
+                    top: 10,
+                    bottom: 10,
+                    right: 8,
+                  },
+                  quickSuggestions: false,
+                  links: false,
+                  lineNumbersMinChars: 2,
+                  lineNumbers: "on",
+                  scrollbar: {
+                    vertical: "visible",
+                    horizontal: "visible",
+                  },
+                  suggestLineHeight: 0,
+                }}
+              />
+            </div>
+          </div>
           <ScrollArea
             className={
               "relative overflow-x-scroll mt-3 sm:mt-0 scrollbar-hidden rounded-sm p-3 border border-border h-60 sm:h-[366px] bg-secondary/40 w-full max-w-full"

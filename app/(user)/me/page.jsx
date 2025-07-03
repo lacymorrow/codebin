@@ -54,12 +54,13 @@ import { LANGUAGE_CONFIG } from "@/app/_constants/config";
 import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
 import Link from "next/link";
+import { Pencil } from "lucide-react";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [loading, setloading] = useState(false);
   const [snippets, setSnippets] = useState([]);
-  const { theme } = useTheme();
+  const { theme, resolvedTheme } = useTheme();
   const [run, setRun] = useState(false);
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [curSnipData, setCurSnipData] = useState(null);
@@ -183,10 +184,14 @@ const UserProfile = () => {
   };
 
   useEffect(() => {
-    getCurrentUser(setUser);
+    if (!user) {
+      getCurrentUser(setUser);
+    }
   }, []);
   useEffect(() => {
-    fetchSnippets();
+    if (!snippets.length) {
+      fetchSnippets();
+    }
   }, [user]);
 
   if (!user) {
@@ -244,8 +249,8 @@ const UserProfile = () => {
         </Button>
       </div>
       <div className="mt-14 grid gap-4 mb-10">
-        <h1 className="text-xs text-foreground/80">My Snippets.</h1>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-auto">
+        <h1 className="text-sm text-foreground/80">My Snippets —</h1>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {snippets &&
             snippets.map((snippet) => (
               <div
@@ -256,7 +261,7 @@ const UserProfile = () => {
                   <ScrollArea className="scrollbar-hidden h-40 rounded-md overflow-hidden">
                     <SyntaxHighlighter
                       language={snippet.language}
-                      style={theme === "dark" ? vscDarkPlus : oneLight}
+                      style={resolvedTheme === "dark" ? vscDarkPlus : oneLight}
                       wrapLines
                       customStyle={{
                         margin: 0,
@@ -274,19 +279,25 @@ const UserProfile = () => {
                     </SyntaxHighlighter>
                   </ScrollArea>
                 </div>
-                <div className="grid px-1 h-fit">
-                  <div className="mb-2 -mt-2">
-                    <Badge>{snippet.language}</Badge>
+                <div className="flex justify-between flex-col px-1 h-full">
+                  <div className="grid">
+                    <div className="mb-2 -mt-2">
+                      <Badge>{snippet.language}</Badge>
+                    </div>
+                    <h1 className="text-base font-medium">{snippet.title}</h1>
+                    <p className="text-sm text-foreground/80">
+                      {snippet.desc
+                        ? snippet.desc.slice(0, 70)
+                        : "No description"}
+                    </p>
                   </div>
-                  <h1 className="text-base font-medium">{snippet.title}</h1>
-                  <p className="text-sm text-foreground/80">
-                    {snippet.desc
-                      ? snippet.desc.slice(0, 70)
-                      : "No description"}
-                  </p>
                   <div className="flex gap-2 items-center justify-between mt-2">
                     <div className="flex gap-2 items-center">
-                      {/* <Button onClick={() => { navigator.clipboard.writeText(snippet.code); toast.success('Code copied!') }}>Copy <Copy className='h-4 w-4' /></Button> */}
+                      <Button size="icon" asChild variant="outline">
+                        <Link href={`/edit/${snippet.id}`}>
+                          <Pencil className="h-3 w-3" />
+                        </Link>
+                      </Button>
                       <Credenza>
                         <CredenzaTrigger asChild>
                           <Button variant="outline">
@@ -332,6 +343,14 @@ const UserProfile = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href={`/edit/${snippet.id}`}
+                            className="flex gap-2 items-center justify-between"
+                          >
+                            Edit <Pencil className="h-4 w-4" />
+                          </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           className="flex gap-2 items-center justify-between"
                           onClick={() => {
