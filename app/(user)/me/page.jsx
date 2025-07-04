@@ -197,7 +197,7 @@ const UserProfile = () => {
   if (!user) {
     return (
       <div className="fixed top-0 left-0 right-0 h-full w-full bg-background flex items-center justify-center z-[99999]">
-        <Loader2 className="h-5 w-5 animate-spin"/>
+        <Loader2 className="h-5 w-5 animate-spin" />
       </div>
     );
   }
@@ -238,7 +238,7 @@ const UserProfile = () => {
                 key={snippet.id}
                 className="border flex flex-col border-border h-full bg-card rounded-md p-2 shadow-sm overflow-hidden"
               >
-                <div className="rounded-md mb-4">
+                <Link href={`/s/${snippet.id}`} className="rounded-md mb-4">
                   <ScrollArea className="scrollbar-hidden h-40 rounded-md overflow-hidden">
                     <SyntaxHighlighter
                       language={snippet.language}
@@ -259,13 +259,18 @@ const UserProfile = () => {
                       {snippet.code}
                     </SyntaxHighlighter>
                   </ScrollArea>
-                </div>
+                </Link>
                 <div className="flex justify-between flex-col px-1 h-full">
                   <div className="grid">
                     <div className="mb-2 -mt-2">
                       <Badge>{snippet.language}</Badge>
                     </div>
-                    <h1 className="text-base font-medium">{snippet.title}</h1>
+                    <Link
+                      href={`/s/${snippet.id}`}
+                      className="text-base font-medium"
+                    >
+                      {snippet.title}
+                    </Link>
                     <p className="text-sm text-foreground/80">
                       {snippet.desc
                         ? snippet.desc.slice(0, 70)
