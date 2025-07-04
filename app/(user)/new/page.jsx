@@ -117,7 +117,7 @@ export default function Page() {
       newDoc.then((e) => {
         setPubId(null);
         toast.success("Snippet created successfully!");
-        router.push(`/edit/${e}`);
+        
         setCode(null);
         setOutput(null);
         setPubId(e);
@@ -450,11 +450,12 @@ export default function Page() {
                       `https://ccodebin.vercel.app/s/${pubId}`,
                     );
                     toast.success("Copied to clipboard!");
+                    router.push(`/edit/${pubId}`);
                   }}
                 >
                   Copy
                 </Button>
-                <Button onClick={() => setShareDialog(false)} variant="outline">
+                <Button onClick={() => {setShareDialog(false); router.push(`/edit/${pubId}`);}} variant="outline">
                   Close
                 </Button>
               </div>
