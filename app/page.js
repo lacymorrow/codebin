@@ -8,6 +8,7 @@ export default function Home() {
       <img
         src="/bg_gradient.avif"
         className="absolute w-full -z-50 -top-0"
+        draggable="false"
       />
       <Header />
       <Hero />
